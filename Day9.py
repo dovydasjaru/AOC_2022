@@ -1,5 +1,4 @@
 import numpy as np
-from math import floor
 
 
 def Travel(path: list) -> np.ndarray:
