@@ -1,4 +1,5 @@
 import numpy as np
+from math import floor
 
 
 def Travel(path: list) -> np.ndarray:
@@ -39,21 +40,26 @@ def Travel(path: list) -> np.ndarray:
 
 def GenericTravel(path: list, rope_length: int) -> np.ndarray:
     spread = GetTravelSpread(path)
-    rope = [[-spread[0], -spread[1]] for _ in range(rope_length)]
+    rope = [[-spread[1], -spread[0]] for _ in range(rope_length)]
     tail_path = np.zeros([spread[3] - spread[1] + 1, spread[2] - spread[0] + 1])
-    tail_path[rope[-1][1], rope[-1][0]] = 1
-    for p in path:
-        if p[0] == "R":
-            MoveRope()
-        elif p[0] == "L":
-        elif p[0] == "D":
-        elif p[0] == "U":
+    tail_path[rope[-1][0], rope[-1][1]] = 1
 
+    for p in path:
+        direction = [0, 0]
+        if p[0] == "R":
+            direction = [0, 1]
+        elif p[0] == "L":
+            direction = [0, -1]
+        elif p[0] == "D":
+            direction = [1, 0]
+        elif p[0] == "U":
+            direction = [-1, 0]
+        
+        for _ in range(p[1]):
+            rope = MoveRope(direction, rope)
+            tail_path[rope[-1][0], rope[-1][1]] = 1
 
     return tail_path
-
-
-def MoveRope()
 
 
 def GetTravelSpread(path: list) -> list:
@@ -80,11 +86,33 @@ def GetTravelSpread(path: list) -> list:
     return max
 
 
+def MoveRope(direction: list, rope: list) -> list:
+    rope[0][0] += direction[0]
+    rope[0][1] += direction[1]
+    for i in range(len(rope) - 1):
+        if IsTouching(rope[i], rope[i + 1]):
+            return rope
+        rope[i + 1] = KeepUpTail(rope[i], rope[i + 1])
+
+    return rope
+
+
+def IsTouching(knot1: list, knot2: list) -> bool:
+    return abs(knot1[0] - knot2[0]) < 2 and abs(knot1[1] - knot2[1]) < 2
+
+
+def KeepUpTail(head: list, tail: list) -> list:
+    difference = [(head[0] - tail[0]) / 2, (head[1] - tail[1]) / 2]
+    difference = [1 if v > 0 else -1 if v < 0 else 0 for v in difference]
+    
+    return [difference[0] + tail[0], difference[1] + tail[1]]
+
+
 f = open("input.txt")
 path = []
 for line in f.readlines():
     p = line.strip().split(" ")
     path.append([p[0], int(p[1])])
 
-tail_path = Travel(path)
-print(np.count_nonzero(tail_path))
+print(np.count_nonzero(Travel(path)))
+print(np.count_nonzero(GenericTravel(path, 10)))
