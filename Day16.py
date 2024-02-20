@@ -70,29 +70,24 @@ def CalculateMaxPressure(time_left: int, current_node: Node, vizitable_nodes: li
 
 def CalculateMaxPressureForTwo(time_left: list[int], current_node: list[Node], vizitable_nodes: list[str]) -> int:
     combined_connections = []
+    max_flow = 0
     for c_node in current_node:
         combined_connections.append({**c_node.connections, **c_node.distant_connections})
-    max_flow = 0
 
     for node_name in vizitable_nodes:
-        elephant_vizitable_nodes = vizitable_nodes.copy()
-        elephant_vizitable_nodes.remove(node_name)
-        for elephant_node_name in elephant_vizitable_nodes:
-            new_time_left = time_left.copy()
-            new_current_node = current_node.copy()
-            left_nodes = elephant_vizitable_nodes.copy()
-            left_nodes.remove(elephant_node_name)
-            current_flow = 0
-            viziting_nodes = [node_name, elephant_node_name]
+        new_time_left = time_left.copy()
+        new_current_node = current_node.copy()
+        left_nodes = vizitable_nodes.copy()
+        left_nodes.remove(node_name)
 
-            for i in range(2):
-                if time_left[i] > combined_connections[i][viziting_nodes[i]][0] + 1:
-                    new_time_left[i] = time_left[i] - (combined_connections[i][viziting_nodes[i]][0] + 1)
-                    new_current_node[i] = combined_connections[i][viziting_nodes[i]][1]
-                    current_flow += new_time_left[i] * new_current_node[i].flow 
-
-            
-            current_flow += CalculateMaxPressureForTwo(new_time_left, new_current_node, left_nodes)
+        i = 0
+        if time_left[1] > time_left[0]:
+            i = 1
+        
+        if time_left[i] > combined_connections[i][node_name][0] + 1:
+            new_time_left[i] = time_left[i] - (combined_connections[i][node_name][0] + 1)
+            new_current_node[i] = combined_connections[i][node_name][1]
+            current_flow = new_time_left[i] * new_current_node[i].flow + CalculateMaxPressureForTwo(new_time_left, new_current_node, left_nodes)
             if current_flow > max_flow:
                 max_flow = current_flow
     
