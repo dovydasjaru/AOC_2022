@@ -5,7 +5,7 @@ import time
 def FindLocation(sensors: list) -> tuple[int, int]:
     min_search_range = 0
     max_search_range = 4000000
-    for y in range(min_search_range, max_search_range + 1):        
+    for y in range(min_search_range, max_search_range + 1):
         positions_range = []
         for sensor, beacon in sensors:
             beacon_distance = abs(sensor[0] - beacon[0]) + abs(sensor[1] - beacon[1])
